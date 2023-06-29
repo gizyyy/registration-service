@@ -1,5 +1,6 @@
 package com.kotlinplayground.application
 
+import com.kotlinplayground.application.exceptions.SchoolNotFoundException
 import com.kotlinplayground.domain.School
 import com.kotlinplayground.domain.Student
 import com.kotlinplayground.domain.Teacher
@@ -14,15 +15,14 @@ class ApplicationService(private val schoolRepository: SchoolRepository) {
     fun addSchool(school: School): Boolean {
         school.register()
         schoolRepository.save(school)
-        return true;
+        return true
     }
 
     @Transactional
     fun addTeacherToSchool(schoolId: String, teacher: Teacher) {
         val foundSchool = schoolRepository.findById(schoolId)
-        //school not found firlat ve bad request donsun, global exceptionhandler bitte
-        if (foundSchool.isEmpty || foundSchool.get() == null)
-            return
+        if (foundSchool.isEmpty)
+            throw SchoolNotFoundException(schoolId)
 
         val school = foundSchool.get()
         school.addTeacher(teacher)
@@ -32,9 +32,8 @@ class ApplicationService(private val schoolRepository: SchoolRepository) {
     @Transactional
     fun addStudentToSchool(schoolId: String, student: Student) {
         val foundSchool = schoolRepository.findById(schoolId)
-        //school not found firlat ve bad request donsun, global exceptionhandler bitte
-        if (foundSchool.isEmpty || foundSchool.get() == null)
-            return
+        if (foundSchool.isEmpty)
+            throw SchoolNotFoundException(schoolId)
 
         val school = foundSchool.get()
         school.addStudent(student)
@@ -44,9 +43,8 @@ class ApplicationService(private val schoolRepository: SchoolRepository) {
     @Transactional
     fun registerStudentToTeacher(schoolId: String, student: Student) {
         val foundSchool = schoolRepository.findById(schoolId)
-        //school not found firlat ve bad request donsun, global exceptionhandler bitte
-        if (foundSchool.isEmpty || foundSchool.get() == null)
-            return
+        if (foundSchool.isEmpty)
+            throw SchoolNotFoundException(schoolId)
 
         val school = foundSchool.get()
         school.addStudent(student)
@@ -56,9 +54,8 @@ class ApplicationService(private val schoolRepository: SchoolRepository) {
     @Transactional
     fun removeStudentFromSchool(schoolId: String, studentId: Int) {
         val foundSchool = schoolRepository.findById(schoolId)
-        //school not found firlat ve bad request donsun, global exceptionhandler bitte
-        if (foundSchool.isEmpty || foundSchool.get() == null)
-            return
+        if (foundSchool.isEmpty)
+            throw SchoolNotFoundException(schoolId)
 
         val school = foundSchool.get()
         school.removeStudent(studentId)
@@ -68,9 +65,8 @@ class ApplicationService(private val schoolRepository: SchoolRepository) {
     @Transactional
     fun removeTeacherFromSchool(schoolId: String, teacherId: Int) {
         val foundSchool = schoolRepository.findById(schoolId)
-        //school not found firlat ve bad request donsun, global exceptionhandler bitte
-        if (foundSchool.isEmpty || foundSchool.get() == null)
-            return
+        if (foundSchool.isEmpty)
+            throw SchoolNotFoundException(schoolId)
 
         val school = foundSchool.get()
         school.removeTeacher(teacherId)
@@ -98,6 +94,6 @@ class ApplicationService(private val schoolRepository: SchoolRepository) {
         val unregistered = getSchool(id)?.unregister()
         if (unregistered == true)
             schoolRepository.deleteById(id)
-        return true;
+        return true
     }
 }

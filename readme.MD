@@ -1,17 +1,10 @@
 # Requirements
 
-1) School holds teacher and classes
-2) One to One relationship between class and teacher
-3) Class can have many students
+- Rest APIs (Ongoing)
+- Data layer with MongoDb (Ongoing)
+- Producers and consumers with kafka (Did not start yet)
+- Some functional programming requirements (Did not start yet)
 
-# REST
+# What is this repo for?
 
-1) Register a student (to a class) - delete student - change student
-2) Register a teacher- change teacher - delete a teacher
-
-# Repository
-
-# Events
-
-# Functional Programming - teacher management api
-
+My daily Kotlin playground to onboard myself, to track my progress...

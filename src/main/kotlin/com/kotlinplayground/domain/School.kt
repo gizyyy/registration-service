@@ -1,20 +1,20 @@
 package com.kotlinplayground.domain
 
+import com.kotlinplayground.domain.domainevents.school.SchoolAddedEvent
+import com.kotlinplayground.domain.domainevents.student.StudentAddedEvent
+import com.kotlinplayground.domain.domainevents.student.StudentRegisteredToTeacherEvent
+import com.kotlinplayground.domain.domainevents.student.StudentRemovedEvent
+import com.kotlinplayground.domain.domainevents.student.StudentUnregisteredFromTeacherEvent
+import com.kotlinplayground.domain.domainevents.teacher.TeacherAssignedEvent
+import com.kotlinplayground.domain.domainevents.teacher.TeacherUnassignedEvent
 import com.kotlinplayground.infrastructure.SchoolIdGenerator
 import com.kotlinplayground.infrastructure.TeacherIdGenerator
-import com.kotlinplayground.infrastructure.events.*
-import com.kotlinplayground.infrastructure.events.school.SchoolAddedEvent
-import com.kotlinplayground.infrastructure.events.student.StudentAddedEvent
-import com.kotlinplayground.infrastructure.events.student.StudentRegisteredToTeacherEvent
-import com.kotlinplayground.infrastructure.events.student.StudentRemovedEvent
-import com.kotlinplayground.infrastructure.events.student.StudentUnregisteredFromTeacherEvent
-import com.kotlinplayground.infrastructure.events.teacher.TeacherAssignedEvent
-import com.kotlinplayground.infrastructure.events.teacher.TeacherUnassignedEvent
 import com.kotlinplayground.infrastructure.repositories.StudentIdGenerator
 import org.springframework.data.annotation.Id
 import org.springframework.data.domain.AbstractAggregateRoot
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.util.CollectionUtils
+import java.time.Instant
 
 @Document("schools")
 data class School(
@@ -28,12 +28,12 @@ data class School(
 
     fun register(): Boolean {
         this.schoolId = SchoolIdGenerator.generate().toString()
-        registerEvent(SchoolAddedEvent(this.schoolId))
+        registerEvent(SchoolAddedEvent(this.schoolId, Instant.now()))
         return true
     }
 
     fun unregister(): Boolean {
-        registerEvent(SchoolAddedEvent(this.schoolId))
+        registerEvent(SchoolAddedEvent(this.schoolId, Instant.now()))
         return true
     }
 
@@ -43,7 +43,7 @@ data class School(
         teacher.id = TeacherIdGenerator.generate()
         //zaten varsa teacher exist bunu da bad requeste maple
         teachers.add(teacher)
-        registerEvent(TeacherAssignedEvent(schoolId, teacher.id))
+        registerEvent(TeacherAssignedEvent(schoolId, teacher.id, Instant.now()))
     }
 
     fun getStudent(studentId: Int): Student? {
@@ -61,7 +61,7 @@ data class School(
         student.id = StudentIdGenerator.generate()
         //zaten varsa exist bunu da bad requeste maple
         students.add(student)
-        registerEvent(StudentAddedEvent(schoolId, student.id))
+        registerEvent(StudentAddedEvent(schoolId, student.id, Instant.now()))
     }
 
     @Synchronized
@@ -74,7 +74,7 @@ data class School(
         //zaten yoksa teacher bunu da bad requeste maple
         if (!removed)
             return
-        registerEvent(TeacherUnassignedEvent(schoolId, teacherId))
+        registerEvent(TeacherUnassignedEvent(schoolId, teacherId, Instant.now()))
     }
 
     @Synchronized
@@ -87,7 +87,7 @@ data class School(
         //zaten yoksa bunu da bad requeste maple
         if (!removed)
             return
-        registerEvent(StudentRemovedEvent(schoolId, studentId))
+        registerEvent(StudentRemovedEvent(schoolId, studentId, Instant.now()))
     }
 
     fun getTeacher(teacherId: Int): Teacher? {
@@ -107,7 +107,14 @@ data class School(
         }
         student.registeredTeachers.find { x: Int -> x == teacherId }
             ?: student.registeredTeachers.add(teacherId)
-        registerEvent(StudentRegisteredToTeacherEvent(this.schoolId, studentId, teacherId))
+        registerEvent(
+            StudentRegisteredToTeacherEvent(
+                this.schoolId,
+                studentId,
+                teacherId,
+                Instant.now()
+            )
+        )
     }
 
     fun unregisterStudentFromTeacher(studentId: Int, teacherId: Int) {
@@ -121,6 +128,13 @@ data class School(
         if (!removed)
             return
 
-        registerEvent(StudentUnregisteredFromTeacherEvent(this.schoolId, studentId, teacherId))
+        registerEvent(
+            StudentUnregisteredFromTeacherEvent(
+                this.schoolId,
+                studentId,
+                teacherId,
+                Instant.now()
+            )
+        )
     }
 }

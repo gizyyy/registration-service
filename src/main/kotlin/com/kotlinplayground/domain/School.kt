@@ -1,10 +1,10 @@
 package com.kotlinplayground.domain
 
+import com.kotlinplayground.application.exceptions.StudentNotFoundException
+import com.kotlinplayground.application.exceptions.TeacherNotFoundException
 import com.kotlinplayground.domain.domainevents.school.SchoolAddedEvent
-import com.kotlinplayground.domain.domainevents.student.StudentAddedEvent
-import com.kotlinplayground.domain.domainevents.student.StudentRegisteredToTeacherEvent
-import com.kotlinplayground.domain.domainevents.student.StudentRemovedEvent
-import com.kotlinplayground.domain.domainevents.student.StudentUnregisteredFromTeacherEvent
+import com.kotlinplayground.domain.domainevents.school.SchoolRemovedEvent
+import com.kotlinplayground.domain.domainevents.student.*
 import com.kotlinplayground.domain.domainevents.teacher.TeacherAssignedEvent
 import com.kotlinplayground.domain.domainevents.teacher.TeacherUnassignedEvent
 import com.kotlinplayground.infrastructure.SchoolIdGenerator
@@ -33,20 +33,28 @@ data class School(
     }
 
     fun unregister(): Boolean {
-        registerEvent(SchoolAddedEvent(this.schoolId, Instant.now()))
+        registerEvent(SchoolRemovedEvent(this.schoolId, Instant.now()))
         return true
     }
 
     @Synchronized
     fun addTeacher(teacher: Teacher) {
-        //mongoda autoincrement
         teacher.id = TeacherIdGenerator.generate()
-        //zaten varsa teacher exist bunu da bad requeste maple
         teachers.add(teacher)
         registerEvent(TeacherAssignedEvent(schoolId, teacher.id, Instant.now()))
     }
 
-    fun getStudent(studentId: Int): Student? {
+    @Synchronized
+    fun changeTeacher(teacherId:Int ,teacher: Teacher) {
+        val teacherFound = teachers.find { it.id == teacherId }
+        val teacherExisting = teacherFound ?: throw TeacherNotFoundException(teacherId.toString())
+        teacherExisting.address = teacher.address
+        teacherExisting.name = teacher.name
+
+        registerEvent(TeacherAssignedEvent(schoolId, teacher.id, Instant.now()))
+    }
+
+    private fun getStudent(studentId: Int): Student? {
         return try {
             students.first { x: Student -> x.id == studentId }
         } catch (e: NoSuchElementException) {
@@ -54,14 +62,20 @@ data class School(
         }
     }
 
-
     @Synchronized
     fun addStudent(student: Student) {
-        //mongoda autoincrement
         student.id = StudentIdGenerator.generate()
-        //zaten varsa exist bunu da bad requeste maple
         students.add(student)
         registerEvent(StudentAddedEvent(schoolId, student.id, Instant.now()))
+    }
+
+    @Synchronized
+    fun replaceStudent(student: Student) {
+        val foundStudent = this.students.find { s: Student -> s.id == student.id }
+        val studentExisting = foundStudent ?: throw StudentNotFoundException(student.id.toString())
+        studentExisting.name = student.name;
+        studentExisting.address = student.address
+        registerEvent(StudentChangedEvent(schoolId, student.id, Instant.now()))
     }
 
     @Synchronized
@@ -71,9 +85,12 @@ data class School(
         }
 
         val removed = teachers.removeIf { x: Teacher -> x.id == teacherId }
-        //zaten yoksa teacher bunu da bad requeste maple
         if (!removed)
             return
+
+        students.forEach {
+            it.registeredTeachers.removeIf { tId: Int -> tId == teacherId }
+        }
         registerEvent(TeacherUnassignedEvent(schoolId, teacherId, Instant.now()))
     }
 
@@ -84,7 +101,6 @@ data class School(
         }
 
         val removed = students.removeIf { x: Student -> x.id == studentId }
-        //zaten yoksa bunu da bad requeste maple
         if (!removed)
             return
         registerEvent(StudentRemovedEvent(schoolId, studentId, Instant.now()))
@@ -99,12 +115,7 @@ data class School(
     }
 
     fun registerStudentToTeacher(studentId: Int, teacherId: Int) {
-        val student = getStudent(studentId)
-
-        if (student == null) {
-            // yoksa bad req
-            return
-        }
+        val student = getStudent(studentId) ?: throw StudentNotFoundException(studentId.toString())
         student.registeredTeachers.find { x: Int -> x == teacherId }
             ?: student.registeredTeachers.add(teacherId)
         registerEvent(
@@ -118,12 +129,7 @@ data class School(
     }
 
     fun unregisterStudentFromTeacher(studentId: Int, teacherId: Int) {
-        val student = getStudent(studentId)
-
-        if (student == null) {
-            // yoksa bad req
-            return
-        }
+        val student = getStudent(studentId) ?: throw StudentNotFoundException(studentId.toString())
         val removed = student.registeredTeachers.removeIf { x: Int -> x == teacherId }
         if (!removed)
             return

@@ -20,5 +20,4 @@ class ApplicationTeacherController(private val applicationService: ApplicationSe
         applicationService.addTeacherToSchool(schoolId,teacher)
         return ResponseEntity.accepted().build()
     }
-
 }

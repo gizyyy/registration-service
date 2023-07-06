@@ -26,14 +26,6 @@ class ApplicationSchoolController(private val applicationService: ApplicationSer
         return ResponseEntity.noContent().build()
     }
 
-    @PostMapping("/schools/{schoolId}/teachers/{teacherId}")
-    fun changeTeacher(
-        @PathVariable schoolId: String, @RequestBody teacher: Teacher
-    ): ResponseEntity<Any> {
-        applicationService.addTeacherToSchool(schoolId,teacher)
-        return ResponseEntity.accepted().build()
-    }
-
     @DeleteMapping("/schools/{schoolId}/students/{studentId}")
     fun deleteStudent(
         @PathVariable schoolId: String,

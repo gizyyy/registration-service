@@ -4,7 +4,12 @@ import com.kotlinplayground.domain.integrationevents.IntegrationEvent
 import java.time.Instant
 
 class StudentRemovedEvent(
-    var schoolId: String, var studentId: Int,
+    override var id: String,
+    var schoolId: String,
     override var occurredAt: Instant
 ) :
-    IntegrationEvent
+    IntegrationEvent {
+    companion object {
+        const val type = "education.service.events.internal.schools.StudentRemovedEvent"
+    }
+}

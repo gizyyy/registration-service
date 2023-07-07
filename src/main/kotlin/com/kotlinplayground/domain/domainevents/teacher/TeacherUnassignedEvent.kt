@@ -10,8 +10,8 @@ class TeacherUnassignedEvent(
     TeacherEvent {
     override fun convertToIntegrationEvent(): TeacherUnassignedEvent {
         return TeacherUnassignedEvent(
+            this.teacherId.toString(),
             this.schoolId,
-            this.teacherId,
             this.occurredAt
         )
     }

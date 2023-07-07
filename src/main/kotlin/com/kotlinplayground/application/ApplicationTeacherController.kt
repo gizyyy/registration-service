@@ -17,8 +17,17 @@ class ApplicationTeacherController(private val applicationService: ApplicationSe
     fun addTeacher(
         @PathVariable schoolId: String, @RequestBody teacher: Teacher
     ): ResponseEntity<Any> {
-        applicationService.addTeacherToSchool(schoolId,teacher)
+        applicationService.addTeacherToSchool(schoolId, teacher)
         return ResponseEntity.accepted().build()
+    }
+
+    @DeleteMapping("/schools/{schoolId}/students/{teacherId}")
+    fun deleteTeacher(
+        @PathVariable schoolId: String,
+        @PathVariable teacherId: Int
+    ): ResponseEntity<Any> {
+        applicationService.removeTeacherFromSchool(schoolId, teacherId)
+        return ResponseEntity.noContent().build()
     }
 
 }

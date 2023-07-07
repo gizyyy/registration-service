@@ -22,12 +22,28 @@ class ApplicationStudentController(private val applicationService: ApplicationSe
     }
 
     @PostMapping("/students/{schoolId}")
-    fun changeStudent(@PathVariable schoolId:String, @RequestBody student: Student
+    fun changeStudent(
+        @PathVariable schoolId: String, @RequestBody student: Student
     ): ResponseEntity<Any> {
         applicationService.changeStudentData(student, schoolId)
         return ResponseEntity.accepted().build()
     }
 
+    @PostMapping("/students/{studentId}/teachers/{teacherId}")
+    fun registerStudentToTeacher(
+        @PathVariable studentId: Int, @PathVariable teacherId: Int
+    ): ResponseEntity<Any> {
+        applicationService.registerStudentToTeacher(studentId, teacherId)
+        return ResponseEntity.accepted().build()
+    }
 
+    @DeleteMapping("/schools/{schoolId}/students/{studentId}")
+    fun deleteStudent(
+        @PathVariable schoolId: String,
+        @PathVariable studentId: Int
+    ): ResponseEntity<Any> {
+        applicationService.removeStudentFromSchool(schoolId, studentId)
+        return ResponseEntity.noContent().build()
+    }
 
 }

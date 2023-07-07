@@ -1,17 +1,23 @@
-package com.kotlinplayground.infrastructure.listener
+package com.kotlinplayground.infrastructure.config
 
 import org.apache.commons.lang3.StringUtils
 
 enum class RouteBinding(var type: String, var binding: String) {
-    SCHOOL_ADDED("education.service.events.external.schools.SchoolRegisteredEvent", "school"),
-    SCHOOL_DELETED("education.service.events.external.schools.SchoolDeletedEvent", "schoolEventReceived"),
+    SCHOOL_ADDED(
+        "education.service.events.external.schools.SchoolRegisteredEvent",
+        "consumeSchoolRegisteredEvent"
+    ),
+    SCHOOL_DELETED(
+        "education.service.events.external.schools.SchoolDeletedEvent",
+        "consumeSchoolDeletedEvent"
+    ),
     STUDENT_DELETED(
         "education.service.events.external.students.StudentDeletedEvent",
-        "studentEventReceived"
+        "consumeStudentDeletedEvent"
     ),
     STUDENT_ADDED(
         "education.service.events.external.students.StudentRegisteredEvent",
-        "studentEventReceived"
+        "consumeStudentRegisteredEvent"
     );
 
     companion object {

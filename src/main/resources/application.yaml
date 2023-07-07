@@ -9,15 +9,39 @@ spring:
     function:
       routing:
         enabled: true
-      definition: functionRouter
+      definition: schoolEventsRouter;studentEventsRouter
     stream:
       bindings:
-        functionRouter-in-0:
-          content-type: application/vnd.cloudevent+json
+        schoolEventsRouter-in-0:
+          content-type: application/json
           destination: external.education.events.schools
-          group: agroup
+          group: schoolGroup
           consumer:
             concurrency: 5
+        schoolEventsRouter-out-0:
+          content-type: application/json
+          destination: internal.education.events.schools
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 5
+        studentEventsRouter-in-0:
+          content-type: application/json
+          destination: external.education.events.students
+          group: studentGroup
+          consumer:
+            concurrency: 5
+        studentEventsRouter-out-0:
+          content-type: application/json
+          destination: internal.education.events.students
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 5
+        teacherEventsRouter-out-0:
+          content-type: application/json
+          destination: internal.education.events.teachers
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 5
       kafka.binder:
         brokers: localhost:9092
         autoCreateTopics: true

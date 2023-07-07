@@ -10,8 +10,8 @@ class TeacherAssignedEvent(
     TeacherEvent {
     override fun convertToIntegrationEvent(): TeacherAssignedEvent {
         return TeacherAssignedEvent(
+            this.teacherId.toString(),
             this.schoolId,
-            this.teacherId,
             this.occurredAt
         )
     }

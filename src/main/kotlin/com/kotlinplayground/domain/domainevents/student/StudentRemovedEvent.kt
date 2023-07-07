@@ -10,8 +10,8 @@ class StudentRemovedEvent(
     StudentEvent {
     override fun convertToIntegrationEvent(): StudentRemovedEvent {
         return StudentRemovedEvent(
+            this.studentId.toString(),
             this.schoolId,
-            this.studentId,
             Instant.now()
         )
     }

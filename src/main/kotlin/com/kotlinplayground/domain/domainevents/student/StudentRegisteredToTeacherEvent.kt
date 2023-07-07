@@ -12,8 +12,8 @@ class StudentRegisteredToTeacherEvent(
     StudentRegisterEvent {
     override fun convertToIntegrationEvent(): StudentRegisteredToTeacherEvent {
         return StudentRegisteredToTeacherEvent(
+            this.studentId.toString(),
             this.schoolId,
-            this.studentId,
             this.teacherId,
             Instant.now()
         )

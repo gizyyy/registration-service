@@ -7,4 +7,8 @@ import java.time.Instant
 data class StudentDeletedEvent(
     var schoolId: String, var studentId: Int,
     var occurredAt: Instant
-)
+){
+    companion object {
+        const val type = "education.service.events.external.students.StudentDeletedEvent"
+    }
+}

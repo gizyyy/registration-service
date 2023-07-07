@@ -9,6 +9,6 @@ class StudentAddedEvent(
 ) :
     StudentEvent {
     override fun convertToIntegrationEvent(): StudentAddedEvent {
-        return StudentAddedEvent(this.schoolId, this.studentId, this.occurredAt)
+        return StudentAddedEvent(this.studentId.toString(), this.schoolId, this.occurredAt)
     }
 }

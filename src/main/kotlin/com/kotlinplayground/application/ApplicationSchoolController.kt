@@ -26,13 +26,4 @@ class ApplicationSchoolController(private val applicationService: ApplicationSer
         return ResponseEntity.noContent().build()
     }
 
-    @DeleteMapping("/schools/{schoolId}/students/{studentId}")
-    fun deleteStudent(
-        @PathVariable schoolId: String,
-        @PathVariable studentId: Int
-    ): ResponseEntity<Any> {
-        applicationService.removeStudentFromSchool(schoolId, studentId)
-        return ResponseEntity.noContent().build()
-    }
-
 }

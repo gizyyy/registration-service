@@ -11,8 +11,8 @@ class StudentUnregisteredFromTeacherEvent(
     StudentRegisterEvent {
     override fun convertToIntegrationEvent(): StudentUnregisteredFromTeacherEvent {
         return StudentUnregisteredFromTeacherEvent(
+            this.studentId.toString(),
             this.schoolId,
-            this.studentId,
             this.teacherId,
             Instant.now()
         )

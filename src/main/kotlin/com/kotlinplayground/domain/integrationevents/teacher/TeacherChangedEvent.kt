@@ -4,9 +4,12 @@ import com.kotlinplayground.domain.integrationevents.IntegrationEvent
 import java.time.Instant
 
 class TeacherChangedEvent(
-    var schoolId: String, var teacherId: Int,
+    override var id: String,
+    var schoolId: String,
     override var occurredAt: Instant
 ) :
     IntegrationEvent {
-
+    companion object {
+        const val type = "education.service.events.internal.schools.TeacherChangedEvent"
+    }
 }

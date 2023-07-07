@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: spring-kotlin-basic
+  data:
+    mongodb:
+      auto-index-creation: true
+      uri: mongodb://0.0.0.0:27017/schools
+  cloud:
+    function:
+      routing:
+        enabled: true
+      definition: functionRouter
+    stream:
+      bindings:
+        functionRouter-in-0:
+          content-type: application/vnd.cloudevent+json
+          destination: external.education.events.schools
+          group: agroup
+          consumer:
+            concurrency: 5
+      kafka.binder:
+        brokers: localhost:9092
+        autoCreateTopics: true
+        configuration:
+          security.protocol: PLAINTEXT
+        consumer-properties:
+          partition.assignment.strategy: org.apache.kafka.clients.consumer.CooperativeStickyAssignor
+          auto.offset.reset: latest
+          enable.auto.commit: false
+          key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        producer-properties:
+          key.serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  jackson:
+    default-property-inclusion: always
+    deserialization:
+      adjust-dates-to-context-time-zone: false
+      fail-on-unknown-properties: false
+    serialization:
+      write-dates-as-timestamps: true

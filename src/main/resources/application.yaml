@@ -9,8 +9,10 @@ spring:
     function:
       routing:
         enabled: true
-      definition: schoolEventsRouter;studentEventsRouter
+      definition: schoolEventsRouter;studentEventsRouter;studentExternalEventSupplier;schoolExternalEventSupplier
     stream:
+      poller:
+        fixedDelay: 10000
       bindings:
         schoolEventsRouter-in-0:
           content-type: application/json
@@ -18,9 +20,22 @@ spring:
           group: schoolGroup
           consumer:
             concurrency: 5
+            max-attempts: 1
         schoolEventsRouter-out-0:
           content-type: application/json
           destination: internal.education.events.schools
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 5
+        studentExternalEventSupplier-out-0:
+          content-type: application/json
+          destination: external.education.events.students
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 5
+        schoolExternalEventSupplier-out-0:
+          content-type: application/json
+          destination: external.education.events.schools
           producer:
             partition-key-expression: headers['partitionKey']
             partition-count: 5
@@ -30,6 +45,7 @@ spring:
           group: studentGroup
           consumer:
             concurrency: 5
+            max-attempts: 1
         studentEventsRouter-out-0:
           content-type: application/json
           destination: internal.education.events.students
@@ -62,3 +78,4 @@ spring:
       fail-on-unknown-properties: false
     serialization:
       write-dates-as-timestamps: true
+

@@ -46,7 +46,7 @@ class ExternalSchoolListener(
     fun consumeSchoolRegisteredEvent(): Consumer<Message<SchoolRegisteredEvent>> {
         return Consumer<Message<SchoolRegisteredEvent>> { schoolRegisteredEvent: Message<SchoolRegisteredEvent> ->
             val event = schoolRegisteredEvent.payload
-            logger.info { "StudentRegisteredEvent will be processed. Event: $event" }
+            logger.info { "SchoolRegisteredEvent will be processed. Event: $event" }
             applicationService.addSchool(event.school)
         }
     }

@@ -2,61 +2,61 @@ package com.kotlinplayground.infrastructure.producer
 
 import com.kotlinplayground.domain.School
 import com.kotlinplayground.domain.Student
-import com.kotlinplayground.domain.Teacher
 import com.kotlinplayground.domain.externalevents.SchoolRegisteredEvent
 import com.kotlinplayground.domain.externalevents.StudentRegisteredEvent
-import org.springframework.cloud.stream.function.StreamBridge
+import mu.KotlinLogging
+import org.springframework.context.annotation.Bean
+import org.springframework.messaging.Message
 import org.springframework.messaging.MessageHeaders
 import org.springframework.messaging.support.MessageBuilder
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.util.UUID.randomUUID
+import java.util.function.Supplier
 
 @Service
-class ExternalSchoolProducer(private val streamBridge: StreamBridge) {
+class ExternalSchoolProducer {
 
-    @Scheduled(cron = "*/20 * * * * *")
-    fun sendExternal() {
-        val event = SchoolRegisteredEvent(
-            School(
-                "1",
-                "adsiz",
-                arrayListOf(),
-                arrayListOf()
+    @Bean
+    fun schoolExternalEventSupplier(): Supplier<Message<SchoolRegisteredEvent>> {
+        return Supplier<Message<SchoolRegisteredEvent>> {
+            val schoolRegisteredEvent = SchoolRegisteredEvent(
+                School(
+                    "1",
+                    "adsiz",
+                    arrayListOf(),
+                    arrayListOf()
+                )
             )
-        )
+            val headersMap = mutableMapOf<String, Any>()
+            headersMap["ce_type"] = SchoolRegisteredEvent.type
+            headersMap["partitionKey"] = schoolRegisteredEvent.school.schoolId
 
-        val randomUUID = randomUUID()
-        var headersMap = mutableMapOf<String, Any>()
-        headersMap["ce_type"] = SchoolRegisteredEvent.type
-        headersMap["partitionKey"] = event.school.schoolId
+            val headers = MessageHeaders(headersMap)
+            MessageBuilder.createMessage(schoolRegisteredEvent, headers)
+        }
+    }
+    @Bean
+    fun studentExternalEventSupplier(): Supplier<Message<StudentRegisteredEvent>> {
+        return Supplier<Message<StudentRegisteredEvent>> {
 
-        var headers = MessageHeaders(headersMap)
-        val message = MessageBuilder.createMessage(event, headers)
+            val event = StudentRegisteredEvent(
+                "1",
+                Student("hede", "add", 2, arrayListOf<Int>()),
+                Instant.now()
+            )
+            logger.info { "StudentRegisteredEvent will be sent. Event: $event" }
 
+            val headersMap = mutableMapOf<String, Any>()
+            headersMap["ce_type"] = StudentRegisteredEvent.type
+            headersMap["partitionKey"] = event.student.id
 
-        streamBridge.send("external.education.events.schools", message);
-
+            val headers = MessageHeaders(headersMap)
+            MessageBuilder.createMessage(event, headers)
+        }
     }
 
-    @Scheduled(cron = "*/20 * * * * *")
-    fun sendExternalStudent() {
-        val event = StudentRegisteredEvent(
-            "1",
-            Student("hede", "add", 2, arrayListOf<Int>()),
-            Instant.now()
-        )
-
-        val randomUUID = randomUUID()
-        var headersMap = mutableMapOf<String, Any>()
-        headersMap["ce_type"] = StudentRegisteredEvent.type
-        headersMap["partitionKey"] = event.student.id
-
-        var headers = MessageHeaders(headersMap)
-        val message = MessageBuilder.createMessage(event, headers)
-
-        streamBridge.send("external.education.events.students", message);
-
+    companion object {
+        val logger = KotlinLogging.logger { }
     }
+
 }

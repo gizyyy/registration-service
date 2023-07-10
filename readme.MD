@@ -1,10 +1,14 @@
 # Requirements
 
-- Rest APIs (Ongoing)
-- Data layer with MongoDb (Ongoing)
-- Producers and consumers with kafka (Did not start yet)
+- Rest APIs (Done)
+- Data layer with MongoDb (Done)
+- Producers and consumers with kafka (Ongoing)
 - Some functional programming requirements (Did not start yet)
 
 # What is this repo for?
 
 My daily Kotlin playground to onboard myself, to track my progress...
+
+# Architecture
+
+![img.png](img.png)

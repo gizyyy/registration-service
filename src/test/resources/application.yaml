@@ -1,0 +1,70 @@
+spring:
+  config.activate.on-profile: test
+  application:
+    name: spring-kotlin-basic
+  data:
+    mongodb:
+      auto-index-creation: true
+      uri: mongodb://0.0.0.0:27017/schools
+  cloud:
+    function:
+      routing:
+        enabled: true
+      definition: schoolEventsRouter;studentEventsRouter;
+    stream:
+      poller:
+        fixedDelay: 10000
+      bindings:
+        schoolEventsRouter-in-0:
+          content-type: application/json
+          destination: external.education.events.schools
+          group: schoolGroup
+          consumer:
+            concurrency: 5
+            max-attempts: 1
+        schoolEventsRouter-out-0:
+          content-type: application/json
+          destination: internal.education.events.schools
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 5
+        studentEventsRouter-in-0:
+          content-type: application/json
+          destination: external.education.events.students
+          group: studentGroup
+          consumer:
+            concurrency: 5
+            max-attempts: 1
+        studentEventsRouter-out-0:
+          content-type: application/json
+          destination: internal.education.events.students
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 5
+        teacherEventsRouter-out-0:
+          content-type: application/json
+          destination: internal.education.events.teachers
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 5
+      kafka.binder:
+        brokers: localhost:9092
+        autoCreateTopics: true
+        configuration:
+          security.protocol: PLAINTEXT
+        consumer-properties:
+          partition.assignment.strategy: org.apache.kafka.clients.consumer.CooperativeStickyAssignor
+          auto.offset.reset: latest
+          enable.auto.commit: false
+          key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        producer-properties:
+          key.serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  jackson:
+    default-property-inclusion: always
+    deserialization:
+      adjust-dates-to-context-time-zone: false
+      fail-on-unknown-properties: false
+    serialization:
+      write-dates-as-timestamps: true
+

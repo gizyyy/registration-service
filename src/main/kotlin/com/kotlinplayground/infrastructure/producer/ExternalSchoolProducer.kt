@@ -30,7 +30,7 @@ class ExternalSchoolProducer {
             val headersMap = mutableMapOf<String, Any>()
             headersMap["ce_type"] = SchoolRegisteredEvent.type
             headersMap["partitionKey"] = schoolRegisteredEvent.school.schoolId
-
+            logger.info { "SchoolRegisteredEvent will be sent. Event: $schoolRegisteredEvent" }
             val headers = MessageHeaders(headersMap)
             MessageBuilder.createMessage(schoolRegisteredEvent, headers)
         }

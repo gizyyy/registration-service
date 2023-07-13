@@ -42,7 +42,7 @@ class IntegrationTests{
 
     @Test
     @Throws(IOException::class)
-    fun whenRouteModifiedEventNotRegisteredIsReceivedThenRegisterActivitiesAndEmitCourierActivitySequenceUpdated() {
+    fun whenSchoolRegisteredEventSentInternalEventShouldBeEmitted() {
         val schoolRegisteredEvent = SchoolRegisteredEvent(
             School(
                 "1",
@@ -67,6 +67,24 @@ class IntegrationTests{
         MatcherAssert.assertThat(
             payload,
             JsonPathMatchers.hasJsonPath("$.id", Matchers.notNullValue())
+
+        )
+
+        MatcherAssert.assertThat(
+            payload,
+            JsonPathMatchers.hasJsonPath(
+                "$.ce_type",
+                Matchers.equalTo("education.service.events.external.students.StudentRegisteredEvent")
+            )
+        )
+
+        MatcherAssert.assertThat(
+            payload,
+            JsonPathMatchers.hasJsonPath("$.datacontenttype", Matchers.equalTo("application/json"))
+        )
+        MatcherAssert.assertThat(
+            payload,
+            JsonPathMatchers.hasJsonPath("$.data.courierId", Matchers.equalTo("13375275"))
         )
     }
 

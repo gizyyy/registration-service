@@ -66,7 +66,7 @@ data class School(
     fun addStudent(student: Student) {
         student.id = StudentIdGenerator.generate()
         students.add(student)
-        registerEvent(StudentAddedEvent(schoolId, student.id, Instant.now()))
+        registerEvent(StudentAddedEvent(schoolId,student.name ,student.id, Instant.now()))
     }
 
     @Synchronized
@@ -75,7 +75,7 @@ data class School(
         val studentExisting = foundStudent ?: throw StudentNotFoundException(student.id.toString())
         studentExisting.name = student.name;
         studentExisting.address = student.address
-        registerEvent(StudentChangedEvent(schoolId, student.id, Instant.now()))
+        registerEvent(StudentChangedEvent(schoolId, student.id, Instant.now(),student.name))
     }
 
     @Synchronized
@@ -103,7 +103,7 @@ data class School(
         val removed = students.removeIf { x: Student -> x.id == studentId }
         if (!removed)
             return
-        registerEvent(StudentRemovedEvent(schoolId, studentId, Instant.now()))
+        registerEvent(StudentRemovedEvent(schoolId, studentId, Instant.now(), ""))
     }
 
     fun getTeacher(teacherId: Int): Teacher? {

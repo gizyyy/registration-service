@@ -6,6 +6,7 @@ import com.kotlinplayground.domain.domainevents.school.SchoolEvent
 import com.kotlinplayground.domain.domainevents.student.StudentEvent
 import com.kotlinplayground.domain.domainevents.teacher.TeacherEvent
 import com.kotlinplayground.domain.externalevents.SchoolRegisteredEvent
+import com.kotlinplayground.domain.externalevents.StudentRegisteredEvent
 import mu.KotlinLogging
 import org.springframework.cloud.stream.function.StreamBridge
 import org.springframework.messaging.MessageHeaders
@@ -21,16 +22,19 @@ class ApplicationEventListener(private val streamBridge: StreamBridge) {
     fun notify(applicationDomainEvent: ApplicationDomainEvent) {
         val integrationEvent = applicationDomainEvent.convertToIntegrationEvent()
         var headersMap = mutableMapOf<String, Any>()
-        headersMap["ce_type"] = SchoolRegisteredEvent.type
+
 
         var target: String = ""
         if (applicationDomainEvent is StudentEvent) {
+            headersMap["ce_type"] = StudentRegisteredEvent.type
             target = "studentEventsRouter-out-0"
         }
-        if (applicationDomainEvent is SchoolEvent)
+        else if (applicationDomainEvent is SchoolEvent) {
             target = "schoolEventsRouter-out-0"
+            headersMap["ce_type"] = SchoolRegisteredEvent.type
+        }
 
-        if (applicationDomainEvent is TeacherEvent)
+       else if (applicationDomainEvent is TeacherEvent)
             target = "teacherEventsRouter-out-0"
 
         headersMap["partitionKey"] = integrationEvent.id

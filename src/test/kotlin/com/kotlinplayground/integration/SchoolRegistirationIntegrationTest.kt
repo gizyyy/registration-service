@@ -3,12 +3,15 @@ package com.kotlinplayground.integration
 import com.jayway.jsonpath.matchers.JsonPathMatchers
 import com.kotlinplayground.domain.School
 import com.kotlinplayground.domain.externalevents.SchoolRegisteredEvent
+import com.kotlinplayground.infrastructure.repositories.SchoolRepository
 import junit.framework.TestCase.*
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.cloud.stream.binder.test.InputDestination
 import org.springframework.cloud.stream.binder.test.OutputDestination
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration
@@ -24,13 +27,16 @@ import java.io.IOException
 @ActiveProfiles("test")
 @SpringBootTest
 @Import(TestChannelBinderConfiguration::class)
-class IntegrationTests {
+class SchoolRegistirationIntegrationTest {
 
     @Autowired
     private val inputDestination: InputDestination? = null
 
     @Autowired
     private val outputDestination: OutputDestination? = null
+
+    @Autowired
+    private val schoolRepository: SchoolRepository? = null
 
     init {
         mongoDBContainer.withNetworkAliases("mongo")
@@ -81,6 +87,8 @@ class IntegrationTests {
             payload,
             JsonPathMatchers.hasJsonPath("$.schoolName", Matchers.equalTo("noName"))
         )
+
+        assertNotNull(schoolRepository!!.findById("1"))
     }
 
 }

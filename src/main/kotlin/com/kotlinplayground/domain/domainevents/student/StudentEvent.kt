@@ -1,7 +1,8 @@
 package com.kotlinplayground.domain.domainevents.student
 
-import com.kotlinplayground.domain.domainevents.school.SchoolEvent
+import com.kotlinplayground.domain.domainevents.ApplicationDomainEvent
 
-interface StudentEvent : SchoolEvent {
+interface StudentEvent : ApplicationDomainEvent {
     var studentId: Int
+    var studentName:String
 }

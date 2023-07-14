@@ -4,8 +4,8 @@ import com.kotlinplayground.domain.integrationevents.student.StudentRemovedEvent
 import java.time.Instant
 
 class StudentRemovedEvent(
-    override var schoolId: String, override var studentId: Int,
-    override var occurredAt: Instant
+    var schoolId: String, override var studentId: Int,
+    override var occurredAt: Instant, override var studentName: String
 ) :
     StudentEvent {
     override fun convertToIntegrationEvent(): StudentRemovedEvent {

@@ -1,7 +1,7 @@
 spring:
   config.activate.on-profile: test
   application:
-    name: spring-kotlin-basic
+    name: registration-service
   data:
     mongodb:
       auto-index-creation: true

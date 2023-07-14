@@ -26,9 +26,9 @@ data class School(
 
 ) : AbstractAggregateRoot<School>() {
 
-    fun register(): Boolean {
+    fun register(schoolName:String): Boolean {
         this.schoolId = SchoolIdGenerator.generate().toString()
-        registerEvent(SchoolAddedEvent(this.schoolId, Instant.now()))
+        registerEvent(SchoolAddedEvent(this.schoolId, schoolName,Instant.now()))
         return true
     }
 

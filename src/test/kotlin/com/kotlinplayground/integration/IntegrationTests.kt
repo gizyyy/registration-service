@@ -24,10 +24,11 @@ import java.io.IOException
 @ActiveProfiles("test")
 @SpringBootTest
 @Import(TestChannelBinderConfiguration::class)
-class IntegrationTests{
+class IntegrationTests {
 
     @Autowired
     private val inputDestination: InputDestination? = null
+
     @Autowired
     private val outputDestination: OutputDestination? = null
 
@@ -46,7 +47,7 @@ class IntegrationTests{
         val schoolRegisteredEvent = SchoolRegisteredEvent(
             School(
                 "1",
-                "adsiz",
+                "noName",
                 arrayListOf(),
                 arrayListOf()
             )
@@ -62,29 +63,23 @@ class IntegrationTests{
         )
 
         // Asserting emitted event
-        val eventJson = outputDestination!!.receive(2000, "internal.education.events.schools").payload
-        val payload = String(eventJson)
+        val received = outputDestination!!.receive(2000, "internal.education.events.schools")
+        val payload = String(received.payload)
         MatcherAssert.assertThat(
             payload,
             JsonPathMatchers.hasJsonPath("$.id", Matchers.notNullValue())
-
         )
-
-        MatcherAssert.assertThat(
-            payload,
-            JsonPathMatchers.hasJsonPath(
-                "$.ce_type",
-                Matchers.equalTo("education.service.events.external.students.StudentRegisteredEvent")
-            )
+        assertEquals(
+            received.headers["ce_type"],
+            "education.service.events.external.schools.SchoolRegisteredEvent"
         )
-
-        MatcherAssert.assertThat(
-            payload,
-            JsonPathMatchers.hasJsonPath("$.datacontenttype", Matchers.equalTo("application/json"))
+        assertEquals(
+            received.headers["contentType"],
+            "application/json"
         )
         MatcherAssert.assertThat(
             payload,
-            JsonPathMatchers.hasJsonPath("$.data.courierId", Matchers.equalTo("13375275"))
+            JsonPathMatchers.hasJsonPath("$.schoolName", Matchers.equalTo("noName"))
         )
     }
 

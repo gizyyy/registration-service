@@ -16,7 +16,7 @@ class ApplicationService(private val schoolRepository: SchoolRepository) {
 
     @Transactional
     fun addSchool(school: School): Boolean {
-        school.register()
+        school.register(school.name)
         schoolRepository.save(school)
         return true
     }

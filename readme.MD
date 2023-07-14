@@ -2,7 +2,7 @@
 
 - Rest APIs (Done)
 - Data layer with MongoDb (Done)
-- Producers and consumers with kafka (Ongoing)
+- Producers and consumers with kafka (Done)
 - Some functional programming requirements (Did not start yet)
 
 # What is this repo for?

@@ -27,12 +27,6 @@ spring:
           producer:
             partition-key-expression: headers['partitionKey']
             partition-count: 5
-        studentExternalEventSupplier-out-0:
-          content-type: application/json
-          destination: external.education.events.students
-          producer:
-            partition-key-expression: headers['partitionKey']
-            partition-count: 5
         schoolExternalEventSupplier-out-0:
           content-type: application/json
           destination: external.education.events.schools

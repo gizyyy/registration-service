@@ -62,9 +62,7 @@ class SchoolControllerTest {
         mockMvc!!.perform(
             post("/schools")
                 .contentType("application/json")
-                .param("sendWelcomeMail", "true")
-                .content(objectMapper!!.writeValueAsString(school))
-        )
+                .content(objectMapper!!.writeValueAsString(school)))
             .andExpect(status().isAccepted)
 
         val received = outputDestination!!.receive(2000, "internal.education.events.schools")

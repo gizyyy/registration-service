@@ -101,6 +101,22 @@ services:
     networks:
       - kafka-network
 
+  connect:
+    image: quay.io/debezium/connect:2.0
+    ports:
+      - 8083:8083
+    links:
+      - kafka
+      - mongo
+    environment:
+      GROUP_ID: 1
+      BOOTSTRAP_SERVERS: kafka:9094
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+    networks:
+      - kafka-network
+
 networks:
   kafka-network:
 #    name: "kafka_default"

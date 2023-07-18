@@ -11,17 +11,19 @@ import org.springframework.messaging.MessageHeaders
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Supplier
 
 @Service
 class ExternalSchoolProducer {
 
+    var atomic: AtomicInteger = AtomicInteger(0)
     @Bean
     fun schoolExternalEventSupplier(): Supplier<Message<SchoolRegisteredEvent>> {
         return Supplier<Message<SchoolRegisteredEvent>> {
             val schoolRegisteredEvent = SchoolRegisteredEvent(
                 School(
-                    "1",
+                    atomic.getAndIncrement().toString(),
                     "adsiz",
                     arrayListOf(),
                     arrayListOf()
